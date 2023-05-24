@@ -10,11 +10,11 @@ public class Player : MonoBehaviour, IKitchenObjectParent
 
     [SerializeField] private GameInput gameInput;
     [SerializeField] private Transform kitchenObjectHoldPoint;
-    private ClearCounter selectedCounter;
+    private BaseCounter selectedCounter;
     public event EventHandler<OnSelectedCounterChangedArgs> OnSelectedCounterChanged;
     private KitchenObject kitchenObject;
 
-    public class OnSelectedCounterChangedArgs : EventArgs { public ClearCounter selectedCounter; }
+    public class OnSelectedCounterChangedArgs : EventArgs { public BaseCounter selectedCounter; }
 
     [SerializeField] private float movementSpeed = 7f;
     private bool isWalking;
@@ -28,11 +28,17 @@ public class Player : MonoBehaviour, IKitchenObjectParent
     private void Start()
     {
         gameInput.OnInteractAction += GameInput_OnInteractAction;
+        gameInput.OnInteractAlternateAction += GameInput_OnInteractAlternateAction;
     }
 
     private void GameInput_OnInteractAction(object sender, System.EventArgs e)
     {
         if (selectedCounter) selectedCounter.Interact(this);
+    }
+
+    private void GameInput_OnInteractAlternateAction(object sender, EventArgs e)
+    {
+        if (selectedCounter) selectedCounter.InteractAlternate(this);
     }
 
     private void Update()
@@ -54,11 +60,11 @@ public class Player : MonoBehaviour, IKitchenObjectParent
 
         float interactDistance = 2f;
         if (Physics.Raycast(transform.position, lastInteractDirection, out RaycastHit raycastHit, interactDistance, countersLayerMask))
-            if (raycastHit.transform.TryGetComponent(out ClearCounter clearCounter))
+            if (raycastHit.transform.TryGetComponent(out BaseCounter baseCounter))
             {
-                if (clearCounter != selectedCounter)
+                if (baseCounter != selectedCounter)
                 {
-                    SetSelectedCounter(clearCounter);
+                    SetSelectedCounter(baseCounter);
                 }
             }
             else SetSelectedCounter(null);
@@ -75,19 +81,18 @@ public class Player : MonoBehaviour, IKitchenObjectParent
         float playerHeight = 2f;
         bool canMove = !Physics.CapsuleCast(transform.position, transform.position + Vector3.up * playerHeight, playerRadius, movementDirection, movementDistance);
 
-        /* Cannot move towards movementDirection */
         if (!canMove)
         {
-            /* X movement */
             Vector3 movementDirectionX = new Vector3(movementDirection.x, 0, 0).normalized;
-            canMove = !Physics.CapsuleCast(transform.position, transform.position + Vector3.up * playerHeight, playerRadius, movementDirectionX, movementDistance);
+            canMove = movementDirection.x != 0 &&
+                !Physics.CapsuleCast(transform.position, transform.position + Vector3.up * playerHeight, playerRadius, movementDirectionX, movementDistance);
 
             if (canMove) movementDirection = movementDirectionX;
             else
             {
-                /* Z movement */
                 Vector3 movementDirectionZ = new Vector3(0, 0, movementDirection.z).normalized;
-                canMove = !Physics.CapsuleCast(transform.position, transform.position + Vector3.up * playerHeight, playerRadius, movementDirectionZ, movementDistance);
+                canMove = movementDirection.z != 0 &&
+                    !Physics.CapsuleCast(transform.position, transform.position + Vector3.up * playerHeight, playerRadius, movementDirectionZ, movementDistance);
 
                 if (canMove) movementDirection = movementDirectionZ;
             }
@@ -100,7 +105,7 @@ public class Player : MonoBehaviour, IKitchenObjectParent
         transform.forward = Vector3.Slerp(transform.forward, movementDirection, Time.deltaTime * rotationSpeed);
     }
 
-    private void SetSelectedCounter(ClearCounter selectedCounter)
+    private void SetSelectedCounter(BaseCounter selectedCounter)
     {
         this.selectedCounter = selectedCounter;
         OnSelectedCounterChanged?.Invoke(this, new OnSelectedCounterChangedArgs
