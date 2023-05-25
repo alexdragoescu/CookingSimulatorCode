@@ -90,7 +90,17 @@ public class StoveCounter : BaseCounter, IHasProgress
                         { progressNormnalized = fryingTimer / fryingRecipeSO.fryingTimerMax });
                 }
         }
-        else if (player.HasKitchenObject()) { }
+        else if (player.HasKitchenObject()) 
+        {
+            if (player.GetKitchenObject().TryGettingPlate(out PlateKitchenObject plateKitchenObject))
+                if (plateKitchenObject.TryAddingIngredient(GetKitchenObject().GetKitchenObjectSO()))
+                {
+                    GetKitchenObject().DestroySelf();
+                    state = State.Idle;
+                    OnStateChanged?.Invoke(this, new OnStateChangedEventArgs { state = state });
+                    OnProgressChanged?.Invoke(this, new IHasProgress.OnProgressChangedEventArgs { progressNormnalized = 0f });
+                }
+        }
         else
         {
             GetKitchenObject().SetKitchenObjectParent(player);
