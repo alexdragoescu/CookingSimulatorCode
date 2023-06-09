@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using Unity.Netcode;
 
 public class GamePauseUI : MonoBehaviour
 {
@@ -10,7 +11,11 @@ public class GamePauseUI : MonoBehaviour
     private void Awake()
     {
         resumeButton.onClick.AddListener(() => { KitchenGameManager.Instance.TogglePauseGame(); });
-        mainMenuButton.onClick.AddListener(() => { Loader.Load(Loader.Scene.MainMenuScene); });
+        mainMenuButton.onClick.AddListener(() => 
+        {
+            NetworkManager.Singleton.Shutdown();
+            Loader.Load(Loader.Scene.MainMenuScene);
+        });
         optionsButton.onClick.AddListener(() => { OptionsUI.Instance.Show(); });
     }
 

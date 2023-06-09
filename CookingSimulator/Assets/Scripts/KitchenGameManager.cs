@@ -22,17 +22,18 @@ public class KitchenGameManager : NetworkBehaviour
         GameOver,
     }
 
+    [SerializeField] private Transform playerPrefab;
     private NetworkVariable<State> state = new NetworkVariable<State>(State.WaitingToStart);
-
     private NetworkVariable<float> countdownToStartTimer = new NetworkVariable<float>(3f);
     private NetworkVariable<float> gamePlayingTimer = new NetworkVariable<float>(0f);
     private NetworkVariable<bool> isGamePaused = new NetworkVariable<bool>(false);
+    private Dictionary<ulong, bool> playerReadyDictionary;
+    private Dictionary<ulong, bool> playerPauseDictionary;
+
     private float gamePlayingTimerMax = 100f;
     private bool isLocalGamePaused = false;
     private bool isLocalPlayerReady = false;
-
-    private Dictionary<ulong, bool> playerReadyDictionary;
-    private Dictionary<ulong, bool> playerPauseDictionary;
+    private bool autoTestGamePausedState;
 
     private void Awake()
     {
@@ -51,6 +52,26 @@ public class KitchenGameManager : NetworkBehaviour
     {
         state.OnValueChanged += State_OnValueChanged;
         isGamePaused.OnValueChanged += IsGamePaused_OnValueChanged;
+
+        if (IsServer)
+        {
+            NetworkManager.Singleton.OnClientDisconnectCallback += NetworkManager_OnClientDisconnectCallback;
+            NetworkManager.Singleton.SceneManager.OnLoadEventCompleted += SceneManager_OnLoadEventCompleted;
+        }
+    }
+
+    private void SceneManager_OnLoadEventCompleted(string sceneName, UnityEngine.SceneManagement.LoadSceneMode loadSceneMode, List<ulong> clientsCompleted, List<ulong> clientsTimedOut)
+    {
+        foreach (ulong clientId in NetworkManager.Singleton.ConnectedClientsIds) 
+        {
+            Transform playerTransform = Instantiate(playerPrefab);
+            playerTransform.GetComponent<NetworkObject>().SpawnAsPlayerObject(clientId, true);
+        }
+    }
+
+    private void NetworkManager_OnClientDisconnectCallback(ulong obj)
+    {
+        autoTestGamePausedState = true;
     }
 
     private void IsGamePaused_OnValueChanged(bool previousValue, bool newValue)
@@ -125,6 +146,15 @@ public class KitchenGameManager : NetworkBehaviour
         }
     }
 
+    private void LateUpdate()
+    {
+        if (autoTestGamePausedState)
+        {
+            autoTestGamePausedState = false;
+            TestGamePausedState();
+        }
+    }
+
     public bool IsGamePlaying()
     {
         return state.Value == State.GamePlaying;
@@ -148,6 +178,11 @@ public class KitchenGameManager : NetworkBehaviour
     public bool IsGameOver()
     {
         return state.Value == State.GameOver;
+    }
+
+    public bool IsWaitingToStart()
+    {
+        return state.Value == State.WaitingToStart;
     }
 
     public float GetGamePlayingTimerNormalized()
