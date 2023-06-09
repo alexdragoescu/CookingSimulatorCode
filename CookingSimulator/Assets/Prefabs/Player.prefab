@@ -94,6 +94,7 @@ MonoBehaviour:
   - {x: 2, y: 0, z: 0}
   - {x: -2, y: 0, z: -2}
   - {x: 2, y: 0, z: -2}
+  playerVisual: {fileID: 1835012170730499379}
   movementSpeed: 7
 --- !u!114 &8558658063844227748
 MonoBehaviour:
@@ -337,6 +338,18 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 4658009219364329039}
   m_SourcePrefab: {fileID: 100100000, guid: 1c5dda3c7cd3cf742afcade5419faeab, type: 3}
+--- !u!114 &1835012170730499379 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7299517728274647395, guid: 1c5dda3c7cd3cf742afcade5419faeab,
+    type: 3}
+  m_PrefabInstance: {fileID: 8951569927179002960}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5873547442418075767}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a4c7b25c827c47469bc30f3470c9b1c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!95 &3433682230392392964 stripped
 Animator:
   m_CorrespondingSourceObject: {fileID: 6024899996280613204, guid: 1c5dda3c7cd3cf742afcade5419faeab,
