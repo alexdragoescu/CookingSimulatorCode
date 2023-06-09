@@ -15,11 +15,11 @@ public class ClearCounter : BaseCounter
             if (player.GetKitchenObject().TryGettingPlate(out PlateKitchenObject plateKitchenObject))
             {
                 if (plateKitchenObject.TryAddingIngredient(GetKitchenObject().GetKitchenObjectSO()))
-                    GetKitchenObject().DestroySelf();
+                    KitchenObject.DestroyKitchenObject(GetKitchenObject());
             }
             else if (GetKitchenObject().TryGettingPlate(out plateKitchenObject))
                 if (plateKitchenObject.TryAddingIngredient(player.GetKitchenObject().GetKitchenObjectSO()))
-                    player.GetKitchenObject().DestroySelf();
+                    KitchenObject.DestroyKitchenObject(player.GetKitchenObject());
         }
         else GetKitchenObject().SetKitchenObjectParent(player);
     }
