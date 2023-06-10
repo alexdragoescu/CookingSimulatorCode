@@ -7,5 +7,6 @@ public class MainMenuCleanUp : MonoBehaviour
     {
         if (NetworkManager.Singleton) Destroy(NetworkManager.Singleton.gameObject);
         if (KitchenGameMultiplayer.Instance) Destroy(KitchenGameMultiplayer.Instance.gameObject);
+        if (KitchenGameLobby.Instance) Destroy(KitchenGameLobby.Instance.gameObject);
     }
 }
