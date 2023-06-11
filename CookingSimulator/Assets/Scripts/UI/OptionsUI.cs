@@ -43,7 +43,11 @@ public class OptionsUI : MonoBehaviour
             UpdateVisual();
         });
 
-        closeButton.onClick.AddListener(() => { Hide(); });
+        closeButton.onClick.AddListener(() => 
+        {
+            Hide();
+            KitchenGameManager.Instance.TogglePauseGame();
+        });
         moveUpButton.onClick.AddListener(() => { RebindBinding(GameInput.Binding.MoveUp); });
         moveDownButton.onClick.AddListener(() => { RebindBinding(GameInput.Binding.MoveDown); });
         moveLeftButton.onClick.AddListener(() => { RebindBinding(GameInput.Binding.MoveLeft); });

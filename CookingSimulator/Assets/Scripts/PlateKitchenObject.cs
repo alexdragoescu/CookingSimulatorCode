@@ -12,6 +12,10 @@ public class PlateKitchenObject : KitchenObject
     [SerializeField] private List<KitchenObjectSO> validKitchenObjectSOList;
     private List<KitchenObjectSO> kitchenObjectSOList;
 
+    private int cookedMeatIndex = 4;
+    private int burnedMeatIndex = 5;
+    private int uncookedMeatIndex = 6;
+
     protected override void Awake()
     {
         base.Awake();
@@ -22,6 +26,7 @@ public class PlateKitchenObject : KitchenObject
     {
         if (!validKitchenObjectSOList.Contains(kitchenObjectSO)) return false;
         if (kitchenObjectSOList.Contains(kitchenObjectSO)) return false;
+        if (!CheckMeat(kitchenObjectSO)) return false;
 
         AddIngredientServerRpc(KitchenGameMultiplayer.Instance.GetKitchenObjectSOIndex(kitchenObjectSO));
         return true;
@@ -44,5 +49,22 @@ public class PlateKitchenObject : KitchenObject
     public List<KitchenObjectSO> GetKitchenObjectSOList()
     {
         return kitchenObjectSOList;
+    }
+
+    private bool CheckMeat(KitchenObjectSO kitchenObjectSO)
+    {
+        if (kitchenObjectSO == validKitchenObjectSOList[cookedMeatIndex]
+            && (kitchenObjectSOList.Contains(validKitchenObjectSOList[burnedMeatIndex])) || (kitchenObjectSOList.Contains(validKitchenObjectSOList[uncookedMeatIndex])))
+            return false;
+
+        if (kitchenObjectSO == validKitchenObjectSOList[burnedMeatIndex]
+            && (kitchenObjectSOList.Contains(validKitchenObjectSOList[cookedMeatIndex])) || (kitchenObjectSOList.Contains(validKitchenObjectSOList[uncookedMeatIndex])))
+            return false;
+
+        if (kitchenObjectSO == validKitchenObjectSOList[uncookedMeatIndex]
+            && (kitchenObjectSOList.Contains(validKitchenObjectSOList[cookedMeatIndex])) || (kitchenObjectSOList.Contains(validKitchenObjectSOList[burnedMeatIndex])))
+            return false;
+
+        return true;
     }
 }

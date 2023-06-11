@@ -7,6 +7,7 @@ public class GamePauseUI : MonoBehaviour
     [SerializeField] private Button resumeButton;
     [SerializeField] private Button mainMenuButton;
     [SerializeField] private Button optionsButton;
+    [SerializeField] private GameObject pauseMultiplayerUI;
 
     private void Awake()
     {
@@ -16,17 +17,22 @@ public class GamePauseUI : MonoBehaviour
             NetworkManager.Singleton.Shutdown();
             Loader.Load(Loader.Scene.MainMenuScene);
         });
-        optionsButton.onClick.AddListener(() => { OptionsUI.Instance.Show(); });
+
+        optionsButton.onClick.AddListener(() => 
+        {
+            Hide();
+            OptionsUI.Instance.Show();
+        });
     }
 
     private void Start()
     {
         KitchenGameManager.Instance.OnLocalGamePaused += KitchenGameManager_OnLocalGamePaused;
-        KitchenGameManager.Instance.OnLocalGameUnpaused += KitchenGameMnager_OnLocalGameUnpaused;
+        KitchenGameManager.Instance.OnLocalGameUnpaused += KitchenGameManager_OnLocalGameUnpaused;
         Hide();
     }
 
-    private void KitchenGameMnager_OnLocalGameUnpaused(object sender, System.EventArgs e)
+    private void KitchenGameManager_OnLocalGameUnpaused(object sender, System.EventArgs e)
     {
         Hide();
     }
@@ -34,6 +40,7 @@ public class GamePauseUI : MonoBehaviour
     private void KitchenGameManager_OnLocalGamePaused(object sender, System.EventArgs e)
     {
         Show();
+        pauseMultiplayerUI.SetActive(false);
     }
 
     private void Show()
